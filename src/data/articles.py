@@ -19,21 +19,17 @@ class ArticleModel(Base):
     date_creation = Column(String)
 
 #Scheme for Article
-class Article(BaseModel):
-    id: int
+class ArticleBase(BaseModel):
     nom: str
     taille: int
     emplacement: str
     type: str
     description: Optional[str]
+class Article(ArticleBase):
+    id: int
     date_creation: str
-
     class Config:
         orm_mode = True
 
-class ArticleCreate(BaseModel):
-    nom: str
-    taille: int
-    emplacement: str
-    type: str
-    description: Optional[str]
+class ArticleCreate(ArticleBase):
+    pass
