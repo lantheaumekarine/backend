@@ -1,5 +1,7 @@
 from .articles import router as articles_router
+from .mailing import router as mailing_router
 
 MAIN_ROUTER = [
-    articles_router
+    articles_router,
+    mailing_router
 ]

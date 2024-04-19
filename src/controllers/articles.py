@@ -37,3 +37,9 @@ class ArticleController:
   @staticmethod
   def get_lasts_articles(db: Session, limit: int = 10):
     return db.query(ArticleModel).order_by(ArticleModel.date_creation.desc()).limit(limit).all()
+  
+def upload_file(file: UploadFile):
+  file_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10)) + file.filename
+  with open(os.path.join("uploads", file_name), "wb") as file_object:
+    file_object.write(file.file.read())
+  return file_name
