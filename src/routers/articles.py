@@ -28,3 +28,7 @@ def get_article_by_id(article_id: int, db: Session = Depends(get_db)):
 @router.post("/")
 def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
   return ArticleController.create_article(db, article)
+
+@router.put("/{article_id}")
+def modify_article(article_id: int, article: ArticleCreate, db: Session = Depends(get_db)):
+  return ArticleController.modify_article(db, article_id, article)

@@ -43,3 +43,16 @@ def upload_file(file: UploadFile):
   with open(os.path.join("uploads", file_name), "wb") as file_object:
     file_object.write(file.file.read())
   return file_name
+
+def modify_article(db: Session, article_id: int, article: ArticleBase):
+  db_article = db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
+  if db_article is None:
+    raise HTTPException(status_code=404, detail="Article not found")
+  db_article.nom = article.nom
+  db_article.taille = article.taille
+  db_article.emplacement = article.emplacement
+  db_article.type = article.type
+  db_article.description = article.description
+  db.commit()
+  db.refresh(db_article)
+  return db_article

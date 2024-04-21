@@ -1,4 +1,3 @@
-
 from typing import Optional, Text
 
 from sqlalchemy import Column, Integer, String, Text
