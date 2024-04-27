@@ -1,3 +1,4 @@
+import os
 from PIL import Image
 
 def resize_image(image_path, output_path, size):
@@ -5,6 +6,9 @@ def resize_image(image_path, output_path, size):
         # Resize image to size
         image.thumbnail(size)
         image.save(output_path)
+    # remove the image from image_path
+    os.remove(image_path)
+
 
 def convert_jpg_to_webp(image_path, output_path):
     # Open the image file
