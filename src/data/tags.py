@@ -15,3 +15,9 @@ class TagModel(Base):
 #Scheme for Tag
 class TagBase(BaseModel):
     tag: str
+
+class Tag(TagBase):
+    id: int
+
+    class Config:
+        orm_mode = True

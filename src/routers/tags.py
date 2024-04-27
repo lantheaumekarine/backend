@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form
 from sqlalchemy.orm import Session
 from typing import List
 
-from data.tags import TagModel, TagBase
+from data.tags import Tag, TagBase
 from utils.database import get_db
 from controllers.tags import TagController
 
@@ -12,7 +12,7 @@ router = APIRouter(
   dependencies=[]
 )
 
-@router.get("/", response_model=List[TagModel])
+@router.get("/", response_model=List[Tag])
 def get_all_tags(db: Session = Depends(get_db)):
   return TagController.get_all_tags(db)
 
