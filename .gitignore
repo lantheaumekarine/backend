@@ -1,3 +1,4 @@
 *.pyc
 src/test.db
 upload
+src/uploads
