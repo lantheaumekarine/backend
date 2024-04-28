@@ -2,6 +2,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
+import logging
+
+logger = logging.getLogger(__name__)
 
 from utils.database import engine, ALLOW_ORIGINS
 from routers import MAIN_ROUTER
