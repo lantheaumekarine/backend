@@ -1,10 +1,9 @@
 import string
-from datetime import datetime
 
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from data.tags import TagBase, TagModel
+from data.articles import TagBase, TagModel, TagCreate
 class TagController:
     @staticmethod
     def get_all_tags(db: Session):
@@ -17,7 +16,7 @@ class TagController:
             return result
 
     @staticmethod
-    def create_tag(db: Session, tag: TagBase):
+    def create_tag(db: Session, tag: TagCreate):
         db_tag = TagModel(
             tag=tag.tag
         )

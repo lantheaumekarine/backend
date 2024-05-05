@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List
 
-from data.articles import Article, ArticleCreate
+from data.articles import Article, ArticleCreate, Tag
 from utils.database import get_db
 from controllers.articles import ArticleController
 
@@ -35,9 +35,12 @@ def get_article_by_id(article_id: int, db: Session = Depends(get_db)):
 def create_article(nom: str, description: str, tags: List[str], file: UploadFile = File(...), db: Session = Depends(get_db)):
   list_tags = []
   for tag in tags:
-    list_tags.append(TagController.get_tag_by_name(db, tag))
-  article = ArticleCreate(nom=nom, description=description, tags=list_tags)
-  return ArticleController.create_article(db, article, file)
+    tag = TagController.get_tag_by_name(db, tag)
+    d_tag = Tag(id=tag.id, tag=tag.tag)
+    list_tags.append(d_tag)
+  print(list_tags)
+  article = ArticleCreate(nom=nom, description=description)
+  return ArticleController.create_article(db, article, file, list_tags)
 
 @router.put("/{article_id}")
 def modify_article(article_id: int, article: ArticleCreate, db: Session = Depends(get_db)):

@@ -2,22 +2,30 @@ import os
 import random
 import string
 from datetime import datetime
+from typing import List
+
 
 from fastapi import HTTPException, UploadFile
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
-from data.articles import ArticleBase, ArticleCreate, Article, ArticleModel
+from data.articles import ArticleBase, ArticleCreate, Article, ArticleModel, Tag, TagBase, TagModel
 from utils.convert import resize_image, convert_jpg_to_webp, tattoo_image
 
 class ArticleController:
 
   @staticmethod
   def get_articles(db: Session, limit: int = 10):
-    return db.query(ArticleModel).limit(limit).all()
+    if db is None:
+      raise HTTPException(status_code=404, detail="Articles not found")
+    else:
+      result = db.query(ArticleModel).options(joinedload(ArticleModel.tags)).limit(limit).all()
+      if result is None:
+        raise HTTPException(status_code=404, detail="Articles not found")
+    return result
   
   @staticmethod
-  def create_article(db: Session, article: ArticleCreate, file: UploadFile):
+  def create_article(db: Session, article: ArticleCreate, file: UploadFile, list_tags: List[Tag]):
     file_name = upload_file(file)
     file_name_without_ext = os.path.splitext(file_name)[0]
     # convert the image to webp
@@ -30,14 +38,18 @@ class ArticleController:
     
     db_article = ArticleModel(
       nom=article.nom,
-      tags=article.tags,
-      emplacement=file_name,
+      path=f'fullsize/{file_name}',
+      thumbnail=f'thumbnails/{file_name}',  
       description=article.description,
       date_creation=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     )
     db.add(db_article)
     db.commit()
     db.refresh(db_article)
+    for tag in list_tags:
+      db_tag = db.query(TagModel).filter(TagModel.id == tag.id).first()
+      db_article.tags.append(db_tag)
+    db.commit()
     return db_article
   
   @staticmethod

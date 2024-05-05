@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Form
 from sqlalchemy.orm import Session
 from typing import List
 
-from data.tags import Tag, TagBase
+from data.articles import Tag, TagBase, TagCreate
 from utils.database import get_db
 from controllers.tags import TagController
 
@@ -17,7 +17,7 @@ def get_all_tags(db: Session = Depends(get_db)):
   return TagController.get_all_tags(db)
 
 @router.post("/")
-def create_tag(tag: TagBase, db: Session = Depends(get_db)):
+def create_tag(tag: TagCreate, db: Session = Depends(get_db)):
   return TagController.create_tag(db, tag)
 
 @router.delete("/{tag_id}")
