@@ -45,3 +45,7 @@ def create_article(nom: str, description: str, tags: List[str], file: UploadFile
 @router.put("/{article_id}")
 def modify_article(article_id: int, article: ArticleCreate, db: Session = Depends(get_db)):
   return ArticleController.modify_article(db, article_id, article)
+
+@router.delete("/{article_id}")
+def delete_article(article_id: int, db: Session = Depends(get_db)):
+  return ArticleController.delete_article(db, article_id)

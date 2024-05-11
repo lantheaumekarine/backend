@@ -60,6 +60,15 @@ class ArticleController:
   def get_lasts_articles(db: Session, limit: int = 10):
     return db.query(ArticleModel).order_by(ArticleModel.date_creation.desc()).limit(limit).all()
   
+  @staticmethod
+  def delete_article(db: Session, article_id: int):
+    db_article = db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
+    if db_article is None:
+      raise HTTPException(status_code=404, detail="Article not found")
+    db.delete(db_article)
+    db.commit()
+    return db_article
+  
 def upload_file(file: UploadFile):
   file_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
   with open(os.path.join("uploads", file_name), "wb") as file_object:
