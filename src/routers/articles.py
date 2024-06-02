@@ -32,15 +32,14 @@ def get_article_by_id(article_id: int, db: Session = Depends(get_db)):
   return ArticleController.get_article_by_id(db, article_id)
 
 @router.post("/")
-def create_article(nom: str, description: str, tags: List[str], file: UploadFile = File(...), db: Session = Depends(get_db)):
+def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
   list_tags = []
-  for tag in tags:
+  for tag in article.tags:
+    print(tag)  
     tag = TagController.get_tag_by_name(db, tag)
     d_tag = Tag(id=tag.id, tag=tag.tag)
     list_tags.append(d_tag)
-  print(list_tags)
-  article = ArticleCreate(nom=nom, description=description)
-  return ArticleController.create_article(db, article, file, list_tags)
+  return ArticleController.create_article(db, article, list_tags)
 
 @router.put("/{article_id}")
 def modify_article(article_id: int, article: ArticleCreate, db: Session = Depends(get_db)):

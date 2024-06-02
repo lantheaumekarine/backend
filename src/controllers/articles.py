@@ -25,22 +25,12 @@ class ArticleController:
     return result
   
   @staticmethod
-  def create_article(db: Session, article: ArticleCreate, file: UploadFile, list_tags: List[Tag]):
-    file_name = upload_file(file)
-    file_name_without_ext = os.path.splitext(file_name)[0]
-    # convert the image to webp
-    convert_jpg_to_webp(f"uploads/{file_name}", f"uploads/{file_name_without_ext}.webp")
-    file_name = f"{file_name_without_ext}.webp"
-    # tatto the file
-    tattoo_image(f"uploads/{file_name}", f"utils/watermark.png", f"uploads/fullsize/{file_name}")
-    # resize the image
-    resize_image(f"uploads/fullsize/{file_name}", f"uploads/thumbnails/{file_name}", (200, 200))
-    
+  def create_article(db: Session, article: ArticleCreate, list_tags: List[Tag]):
+
     db_article = ArticleModel(
-      nom=article.nom,
-      path=f'fullsize/{file_name}',
-      thumbnail=f'thumbnails/{file_name}',  
+      nom=article.nom, 
       description=article.description,
+      file_id=article.file_id,
       date_creation=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     )
     db.add(db_article)
@@ -69,21 +59,20 @@ class ArticleController:
     db.commit()
     return db_article
   
+  @staticmethod
+  def modify_article(db: Session, article_id: int, article: ArticleBase):
+    db_article = db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
+    if db_article is None:
+      raise HTTPException(status_code=404, detail="Article not found")
+    db_article.nom = article.nom
+    db_article.description = article.description
+    db.commit()
+    db.refresh(db_article)
+    return db_article
 def upload_file(file: UploadFile):
   file_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
   with open(os.path.join("uploads", file_name), "wb") as file_object:
     file_object.write(file.file.read())
   return file_name
 
-def modify_article(db: Session, article_id: int, article: ArticleBase):
-  db_article = db.query(ArticleModel).filter(ArticleModel.id == article_id).first()
-  if db_article is None:
-    raise HTTPException(status_code=404, detail="Article not found")
-  db_article.nom = article.nom
-  db_article.taille = article.taille
-  db_article.emplacement = article.emplacement
-  db_article.type = article.type
-  db_article.description = article.description
-  db.commit()
-  db.refresh(db_article)
-  return db_article
+
