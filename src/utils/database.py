@@ -19,6 +19,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 ALLOW_ORIGINS = config("ALLOW_ORIGINS", cast=str)
+SECRET_KEY = config("SECRET_KEY", cast=str)
 # Database SessionLocal Dependency
 def get_db():
     db = SessionLocal()
