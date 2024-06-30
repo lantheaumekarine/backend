@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from sqlalchemy import Column, Integer, String
 from utils.database import Base
 
@@ -13,18 +13,34 @@ class UserDB(Base):
 
 
 
+# Schema
+class UserBase(BaseModel):
+    username: str
+    password: constr(min_length=7, max_length=100)
+    email: str
 
-class User(BaseModel):
-  id: int
+class UserPasswordUpdate(UserBase):
+    """
+    Users can change their password
+    """
+    password: constr(min_length=7, max_length=100)
+    salt: str
 
-  class Config:
-    orm_mode = True
 
+class UserCreate(UserBase):
+    pass
 
-class UserCreate(User):
-  username: str
-  email: str
-  password: str
+    
+
+class User(UserBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+class UserAuthenticated(UserPasswordUpdate):
+    pass
+
 class UserModify(User):
   email: str
   password: str

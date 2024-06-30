@@ -5,6 +5,7 @@ from typing import List
 from data.user import User, UserCreate, UserModify
 from utils.database import get_db
 from controllers.user import UserController
+from fastapi.security import OAuth2PasswordRequestForm
 
 import logging
 
@@ -37,5 +38,5 @@ def modify_user(user_id: int, user: UserModify, db: Session = Depends(get_db)):
   return UserController.modify_user(db, user_id, user)
 
 @router.post("/login")
-def login(user: UserCreate, db: Session = Depends(get_db)):
-  return UserController.login(db, user)
+def login(data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db) ):
+    return UserController.user_login(db=db, user_username=data.username, user_password=data.password)

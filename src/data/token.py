@@ -1,14 +1,14 @@
 from datetime import datetime, timedelta
 from pydantic import BaseModel, EmailStr
-from tools.config import JWT_ISSUER, JWT_AUDIENCE, ACCESS_TOKEN_EXPIRE_MINUTES
+from utils.config import JWT_ISSUER, JWT_AUDIENCE, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 
 class JWTMeta(BaseModel):
     iss: str = JWT_ISSUER
     aud: str = JWT_AUDIENCE
-    iat: float = datetime.timestamp(datetime.utcnow())
-    exp: float = datetime.timestamp(datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    iat: float = datetime.now().timestamp()
+    exp: float = datetime.timestamp(datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
 class JWTCreds(BaseModel):
     """How we'll identify users"""
     sub: str

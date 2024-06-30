@@ -4,21 +4,25 @@ import string
 from datetime import datetime
 from typing import List
 
-from fastapi import HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from data.user import UserCreate, User, UserModify
+from data.user import UserCreate, User, UserModify, UserPasswordUpdate, UserDB
+from data.token import AccessToken
+from middelware.authenticate import AuthSrvice as auth_service
+
+from fastapi_login.exceptions import InvalidCredentialsException
 
 class UserController:
 
   @staticmethod
   def create_user(db: Session, user: UserCreate):
-    db_user = User(
-      username=user.username,
-      email=user.email,
-      password=user.password
-    )
+    auth = auth_service()
+    salt, password = auth.create_salt_and_hashed_password(plaintext_password=user.password)
+    salty_user = UserPasswordUpdate(**user.dict(), salt = salt)
+    salty_user.password = password
+    db_user = UserDB(**salty_user.dict())
+    print(db_user)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -62,10 +66,13 @@ class UserController:
     return db_user
   
   @staticmethod
-  def login(db: Session, user: UserCreate):
-    db_user = db.query(User).filter(User.email == user.email).first()
+  def user_login(db: Session, user_username: str, user_password: str):
+    auth = auth_service()
+    db_user = db.query(UserDB).filter(UserDB.username == user_username).first()
     if db_user is None:
-      raise HTTPException(status_code=404, detail="User not found")
-    if db_user.password != user.password:
-      raise HTTPException(status_code=401, detail="Invalid password")
-    return db_user
+        raise InvalidCredentialsException
+    
+    if not auth.verify_password(password=user_password, salt=db_user.salt, hashed_pw=db_user.password):
+        raise InvalidCredentialsException
+    access_token = AccessToken(access_token=auth.create_access_token_for_user(user=db_user), token_type="bearer")
+    return access_token
