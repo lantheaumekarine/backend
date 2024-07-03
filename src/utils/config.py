@@ -16,5 +16,6 @@ JWT_TOKEN_PREFIX = config("JWT_TOKEN_PREFIX", cast=str, default="Bearer")
 
 manager = LoginManager(
     secret=config("SECRET_KEY"),
-    token_url="/users/login"
+    token_url="/users/login",
+    use_cookie=True
 )

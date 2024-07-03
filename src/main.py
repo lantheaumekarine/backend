@@ -1,10 +1,10 @@
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 import logging
 from middelware.authenticate import authenticate
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +19,7 @@ app = FastAPI()
 
 
 
-
-app.add_middleware(BaseHTTPMiddleware, dispatch=authenticate)
+#app.add_middleware(BaseHTTPMiddleware, dispatch=authenticate)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[ALLOW_ORIGINS],

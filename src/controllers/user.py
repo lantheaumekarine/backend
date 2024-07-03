@@ -12,6 +12,9 @@ from data.token import AccessToken
 from middelware.authenticate import AuthSrvice as auth_service
 
 from fastapi_login.exceptions import InvalidCredentialsException
+from utils.config import manager
+from fastapi.responses import JSONResponse
+
 
 class UserController:
 
@@ -75,4 +78,6 @@ class UserController:
     if not auth.verify_password(password=user_password, salt=db_user.salt, hashed_pw=db_user.password):
         raise InvalidCredentialsException
     access_token = AccessToken(access_token=auth.create_access_token_for_user(user=db_user), token_type="bearer")
-    return access_token
+    response = JSONResponse(content={"Connected": True}, status_code=200)
+    manager.set_cookie(response, access_token)
+    return response
