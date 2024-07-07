@@ -5,6 +5,7 @@ from typing import List
 from data.articles import Article, ArticleCreate, Tag
 from utils.database import get_db
 from controllers.articles import ArticleController
+from utils.config import manager
 
 from controllers.tags import TagController
 
@@ -32,7 +33,7 @@ def get_article_by_id(article_id: int, db: Session = Depends(get_db)):
   return ArticleController.get_article_by_id(db, article_id)
 
 @router.post("/")
-def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
+def create_article(article: ArticleCreate, db: Session = Depends(get_db), user = Depends(manager)):
   list_tags = []
   for tag in article.tags:
     print(tag)  
@@ -42,9 +43,9 @@ def create_article(article: ArticleCreate, db: Session = Depends(get_db)):
   return ArticleController.create_article(db, article, list_tags)
 
 @router.put("/{article_id}")
-def modify_article(article_id: int, article: ArticleCreate, db: Session = Depends(get_db)):
+def modify_article(article_id: int, article: ArticleCreate, db: Session = Depends(get_db), user = Depends(manager)):
   return ArticleController.modify_article(db, article_id, article)
 
 @router.delete("/{article_id}")
-def delete_article(article_id: int, db: Session = Depends(get_db)):
+def delete_article(article_id: int, db: Session = Depends(get_db), user = Depends(manager)):
   return ArticleController.delete_article(db, article_id)

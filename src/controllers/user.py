@@ -8,12 +8,12 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from data.user import UserCreate, User, UserModify, UserPasswordUpdate, UserDB
-from data.token import AccessToken
 from middelware.authenticate import AuthSrvice as auth_service
 
 from fastapi_login.exceptions import InvalidCredentialsException
 from utils.config import manager
 from fastapi.responses import JSONResponse
+from utils.database import SessionLocal
 
 
 class UserController:
@@ -33,25 +33,25 @@ class UserController:
 
   @staticmethod
   def get_user_by_id(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
+    return db.query(UserDB).filter(UserDB.id == user_id).first()
 
   @staticmethod
   def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
+    return db.query(UserDB).filter(UserDB.email == email).first()
 
   @staticmethod
   def get_users(db: Session, limit: int = 10):
     if db is None:
       raise HTTPException(status_code=404, detail="Users not found")
     else:
-      result = db.query(User).limit(limit).all()
+      result = db.query(UserDB).limit(limit).all()
       if result is None:
         raise HTTPException(status_code=404, detail="Users not found")
     return result
 
   @staticmethod
   def modify_user(db: Session, user_id: int, user: UserModify):
-    db_user = db.query(User).filter(User.id == user_id).first()
+    db_user = db.query(UserDB).filter(UserDB.id == user_id).first()
     if db_user is None:
       raise HTTPException(status_code=404, detail="User not found")
     db_user.email = user.email
@@ -61,7 +61,7 @@ class UserController:
 
   @staticmethod
   def delete_user(db: Session, user_id: int):
-    db_user = db.query(User).filter(User.id == user_id).first()
+    db_user = db.query(UserDB).filter(UserDB.id == user_id).first()
     if db_user is None:
       raise HTTPException(status_code=404, detail="User not found")
     db.delete(db_user)
@@ -77,7 +77,12 @@ class UserController:
     
     if not auth.verify_password(password=user_password, salt=db_user.salt, hashed_pw=db_user.password):
         raise InvalidCredentialsException
-    access_token = AccessToken(access_token=auth.create_access_token_for_user(user=db_user), token_type="bearer")
+    token = manager.create_access_token(data={"sub": db_user.username})
     response = JSONResponse(content={"Connected": True}, status_code=200)
-    manager.set_cookie(response, access_token)
+    manager.set_cookie(response, token)
     return response
+
+@manager.user_loader()
+def get_user(name: str):
+    with SessionLocal() as db:
+        return UserController.get_user_by_email(db, name)
