@@ -20,8 +20,8 @@ router = APIRouter(
 )
 
 @router.get("/", response_model=List[Article])
-def get_articles(db: Session = Depends(get_db), limit: int = 10):
-  return ArticleController.get_articles(db,limit)
+def get_articles(db: Session = Depends(get_db), limit: int = 10, tag: str = None):
+  return ArticleController.get_articles(db, limit, tag)
 
 @router.get("/lasts", response_model=List[Article])
 def get_lasts_articles(db: Session = Depends(get_db), limit: int = 10):

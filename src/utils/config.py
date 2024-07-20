@@ -19,3 +19,8 @@ manager = LoginManager(
     token_url="/users/login",
     use_cookie=True
 )
+
+password_manager = LoginManager(
+    secret=config("SECRET_KEY"),
+    token_url="/users/reset-password"
+)

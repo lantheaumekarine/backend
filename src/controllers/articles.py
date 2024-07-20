@@ -6,7 +6,6 @@ from typing import List
 
 
 from fastapi import HTTPException, UploadFile
-from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload
 
 from data.articles import ArticleBase, ArticleCreate, Article, ArticleModel, Tag, TagBase, TagModel
@@ -15,11 +14,17 @@ from utils.convert import resize_image, convert_jpg_to_webp, tattoo_image
 class ArticleController:
 
   @staticmethod
-  def get_articles(db: Session, limit: int = 10):
+  def get_articles(db: Session, limit: int = 10, tag: str = None):
     if db is None:
       raise HTTPException(status_code=404, detail="Articles not found")
     else:
-      result = db.query(ArticleModel).options(joinedload(ArticleModel.tags)).limit(limit).all()
+      query = db.query(ArticleModel).options(joinedload(ArticleModel.tags))
+
+      if tag:
+          # Filter articles by tag
+          query = query.join(ArticleModel.tags).filter(TagModel.tag == tag)
+
+      result = query.limit(limit).all()
       if result is None:
         raise HTTPException(status_code=404, detail="Articles not found")
     return result
