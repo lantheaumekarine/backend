@@ -1,5 +1,4 @@
 from fastapi import Request
-import jwt  
 import bcrypt
 from passlib.context import CryptContext
 from datetime import datetime, timedelta  
