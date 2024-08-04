@@ -5,7 +5,7 @@ from starlette.config import Config
 
 config = Config(".env")
 
-SQLALCHEMY_SQLITE_URL = "sqlite:///./test.db"
+SQLALCHEMY_SQLITE_URL = "sqlite:///./db/database.db"
 SQLALCHEMY_PGSQL_URL = "postgresql://webuser:password@localhost/test"
 
 engine = create_engine(
