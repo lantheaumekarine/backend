@@ -77,7 +77,7 @@ class UserController:
     
     if not auth.verify_password(password=user_password, salt=db_user.salt, hashed_pw=db_user.password):
         raise InvalidCredentialsException
-    token = manager.create_access_token(data={"sub": db_user.username})
+    token = manager.create_access_token(data={"sub": db_user.email})
     response = JSONResponse(content={"Connected": True}, status_code=200)
     manager.set_cookie(response, token)
     return response
