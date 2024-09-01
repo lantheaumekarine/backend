@@ -70,7 +70,7 @@ class Article(ArticleBase):
 
 class ArticleCreate(ArticleBase):
     file_id: int
-    tags: List[str]
+    tags: List[TagBase]
 
     class Config:
         orm_mode = True
